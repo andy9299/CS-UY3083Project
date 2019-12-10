@@ -19,7 +19,12 @@
 			{{person.firstName}} "{{person.username}}" {{person.lastName}}
 			<br>
 		{% endfor %}
-		<br>
+		{% for line in likes %}
+			Liked by: {{line.username}}
+			<br>
+			Rating given: {{line.rating}}
+			<br>
+		{% endfor %}
         <a href="/images">Go back</a>
     </body>
 </html>
