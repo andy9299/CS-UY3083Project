@@ -5,14 +5,13 @@
     <body>
         <h1>Image Gallery </h1>
 		<div>
-            <form action="/imageSearch" method="post">
+            <form action="/imageSearchByPoster" method="post">
                 <input type="text" name="poster" placeholder="Enter Poster by Username" required/>
                 <br/>
                 <input type="submit" value="Search By Poster">
             </form>
         </div>
-        <div>
-			
+        <div>	
             {% for image in images %}
 			<br>
 			<br>
