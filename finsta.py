@@ -199,7 +199,6 @@ def upload_image():
 def addLike():
     username = session['username']
     rating = request.form['rating']
-    return render_template("likes.html")
     if request.form:
         queryPID = 'SELECT photoID ' \
             'FROM photo ' \
