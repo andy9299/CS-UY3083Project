@@ -195,6 +195,7 @@ def upload_image():
         message = "Failed to upload image."
         return render_template("upload.html", message=message)
 
+@app.route("/addLike", methods=["GET", "POST"])
 def addLike():
     username = session['username']
     rating = request.form['rating']
@@ -214,14 +215,15 @@ def addLike():
             + session["username"] +"\"" + \
             " ORDER BY photoID DESC"
         with connection.cursor() as cursor:
-            photoID = cursor.execute(queryPID)
+            cursor.execute(query) #finds photoIDs
         tstampsec = time.time()
         timestamp = time.ctime(tstampsec)
-        query = 'INSERT INTO likes' \
-                'VALUES(' + username + photoID + timestamp + rating + ')'
+        query1 = 'INSERT INTO likes' \
+                 'VALUES(' + username + photoID + timestamp + rating + ')'
         with connection.cursor() as cursor:
-            cursor.execute(query)
-    cursor.close()
+            cursor.execute(query1) #inserts values into the table
+        return render_template("image_info.html", likes=likes)
+    
     
 #NEEDS TO BE UPDATED
 @app.route("/imageSearch", methods=["GET", "POST"])
