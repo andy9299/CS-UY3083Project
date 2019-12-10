@@ -9,9 +9,11 @@
 		<br>
 		PhotoID: {{image[0].photoID}}
 		<br>
+		<br>
 		Posted By: {{image[0].firstName}} "{{image[0].photoPoster}}" {{image[0].lastName}}
 		<br>
 		Posted On: {{image[0].postingdate}}
+		<br>
 		<br>
 		Tagged People:
 		<br>
@@ -19,12 +21,14 @@
 			{{person.firstName}} "{{person.username}}" {{person.lastName}}
 			<br>
 		{% endfor %}
-		{% for line in likes %}
-			Liked by: {{line.username}}
-			<br>
-			Rating given: {{line.rating}}
+		<br>
+		Ratings:
+		<br>
+		{% for person in likes %}
+			{{person.username}} rated this photo a {{person.rating}}
 			<br>
 		{% endfor %}
+		<br>
         <a href="/images">Go back</a>
     </body>
 </html>
