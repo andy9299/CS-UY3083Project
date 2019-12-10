@@ -87,29 +87,21 @@ def image_info():
             + session["username"] +"\" " \
             'AND p.photoID = "' \
             + request.form["photoID"] + "\""
-    #THIS QUERY IS MESSED UP WILL BE FIXED
-    query2 = 'SELECT t.username, p1.firstName, p1.lastName ' \
-             'FROM tagged as t ' \
-             'JOIN person as p1 ON (t.username = p1.username) ' \
-             'WHERE photoID IN ( ' \
-             'SELECT photoID ' \
-             'FROM photo JOIN follow ON (username_followed = photoPoster) ' \
-             'WHERE followstatus = TRUE AND allFollowers = TRUE AND username_follower = "' \
-             + session["username"] + "\"" + \
-             ' UNION ' \
-             'SELECT p.photoID ' \
-             'FROM photo as p ' \
-             'JOIN sharedwith as s ON (p.photoID = s.photoID) ' \
-             'JOIN belongto as b ON (b.groupName = s.groupName AND b.owner_username = s.groupOwner) ' \
-             'WHERE b.member_username = "' \
-             + session["username"] + "\")" + \
-             ' AND t.tagstatus = TRUE'
+    query2 ="""SELECT per.username, per.firstName, per.lastName
+            FROM tagged as t 
+            JOIN person as per ON (t.username = per.username)
+            WHERE t.tagstatus = TRUE AND t.photoID = \"""" + request.form["photoID"] + "\""
+    query3 = """SELECT username, rating
+            FROM likes
+            WHERE photoID = \"""" + request.form["photoID"] + "\""
     with connection.cursor() as cursor:
         cursor.execute(query)
         data = cursor.fetchall()
         cursor.execute(query2)
         data2 = cursor.fetchall()
-    return render_template("image_info.html", image=data, tagged=data2)
+        cursor.execute(query3)
+        data3 = cursor.fetchall()
+    return render_template("image_info.html", image=data, tagged=data2, likes=data3)
 
 @app.route("/login", methods=["GET"])
 def login():
