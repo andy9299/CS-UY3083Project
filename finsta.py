@@ -49,13 +49,13 @@ def upload():
 @app.route("/images", methods=["GET"])
 @login_required
 def images():
-    query = 'SELECT photoID ' \
-            'FROM photo ' \
-            'JOIN follow ON (username_followed = photoPoster) ' \
+    query = 'SELECT p.filepath, p.photoID, p.photoPoster ' \
+            'FROM photo as p ' \
+            'JOIN follow as f ON (f.username_followed = p.photoPoster) ' \
             'WHERE followstatus = TRUE AND allFollowers = TRUE AND username_follower = "' \
             + session["username"] \
             + '" UNION ' \
-            'SELECT p.photoID ' \
+            'SELECT p.filepath, p.photoID, p.photoPoster ' \
             'FROM photo as p ' \
             'JOIN sharedwith as s ON (p.photoID = s.photoID) ' \
             'JOIN belongto as b ON (b.groupName = s.groupName AND b.owner_username = s.groupOwner) ' \
@@ -64,14 +64,52 @@ def images():
             " ORDER BY photoID DESC"
     with connection.cursor() as cursor:
         cursor.execute(query)
-    data = cursor.fetchall()
+        data = cursor.fetchall()
     return render_template("images.html", images=data)
 
-@app.route("/image/<image_name>", methods=["GET"])
-def image(image_name):
-    image_location = os.path.join(IMAGES_DIR, image_name)
-    if os.path.isfile(image_location):
-        return send_file(image_location, mimetype="image/jpg")
+@app.route("/image_info", methods=["GET", "POST"])
+def image_info():
+    query = 'SELECT p.filepath, p.photoID, p.photoPoster, per.firstName, per.lastName, p.postingdate ' \
+            'FROM photo as p ' \
+            'JOIN follow as f ON (f.username_followed = p.photoPoster) ' \
+            'JOIN person as per ON (per.username = p.photoPoster) ' \
+            'WHERE followstatus = TRUE AND allFollowers = TRUE AND username_follower = "' \
+            + session["username"] \
+            + '" AND p.photoID = "' \
+            + request.form["photoID"] \
+            + '" UNION ' \
+            'SELECT p.filepath, p.photoID, p.photoPoster, per.firstName, per.lastName, p.postingdate ' \
+            'FROM photo as p ' \
+            'JOIN sharedwith as s ON (p.photoID = s.photoID) ' \
+            'JOIN belongto as b ON (b.groupName = s.groupName AND b.owner_username = s.groupOwner) ' \
+            'JOIN person as per ON (per.username = p.photoPoster) ' \
+            'WHERE b.member_username = "' \
+            + session["username"] +"\" " \
+            'AND p.photoID = "' \
+            + request.form["photoID"] + "\""
+    #THIS QUERY IS MESSED UP WILL BE FIXED
+    query2 = 'SELECT t.username, p1.firstName, p1.lastName ' \
+             'FROM tagged as t ' \
+             'JOIN person as p1 ON (t.username = p1.username) ' \
+             'WHERE photoID IN ( ' \
+             'SELECT photoID ' \
+             'FROM photo JOIN follow ON (username_followed = photoPoster) ' \
+             'WHERE followstatus = TRUE AND allFollowers = TRUE AND username_follower = "' \
+             + session["username"] + "\"" + \
+             ' UNION ' \
+             'SELECT p.photoID ' \
+             'FROM photo as p ' \
+             'JOIN sharedwith as s ON (p.photoID = s.photoID) ' \
+             'JOIN belongto as b ON (b.groupName = s.groupName AND b.owner_username = s.groupOwner) ' \
+             'WHERE b.member_username = "' \
+             + session["username"] + "\")" + \
+             ' AND t.tagstatus = TRUE'
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        data = cursor.fetchall()
+        cursor.execute(query2)
+        data2 = cursor.fetchall()
+    return render_template("image_info.html", image=data, tagged=data2)
 
 @app.route("/login", methods=["GET"])
 def login():
@@ -184,7 +222,8 @@ def addLike():
         with connection.cursor() as cursor:
             cursor.execute(query)
     cursor.close()
-
+    
+#NEEDS TO BE UPDATED
 @app.route("/imageSearch", methods=["GET", "POST"])
 def imageSearch():
     if request.form:
