@@ -5,7 +5,7 @@
     <body>
         <h1>Images Posted By {{poster}}</h1>
 		<div>
-            <form action="/imageSearch" method="post">
+            <form action="/imageSearchByPoster" method="post">
                 <input type="text" name="poster" placeholder="Enter Poster by Username" required/>
                 <br/>
                 <input type="submit" value="Search By Poster">
@@ -13,11 +13,20 @@
         </div>
         <div>
             {% for image in images %}
-
-            <!--<img src="/images/{{image.filepath}}" width="300"/>-->
-			{{image}}
+			<br>
+			<br>
+			<br>
+			{{image.filepath}}
+			<br>
+			PhotoID: {{image.photoID}} 
+			<br>
+			Posted By: {{image.photoPoster}}
+			<br>
+			 <td><form action="/image_info" method="post"><input type="submit" value="More Info"><input type="hidden" name="photoID" value={{image.photoID}}></form></td>
+			<br>
             {% endfor %}
         </div>
-        <a href="/">Go back</a>
+		<br>
+        <a href="/images">Go back</a>
     </body>
 </html>
