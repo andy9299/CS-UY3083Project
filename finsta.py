@@ -215,10 +215,8 @@ def addLike():
             cursor.execute(query1) #inserts values into the table
         return render_template("image_info.html", likes=likes)
     
-    
-#NEEDS TO BE UPDATED
-@app.route("/imageSearch", methods=["GET", "POST"])
-def imageSearch():
+@app.route("/imageSearchByPoster", methods=["GET", "POST"])
+def imageSearchByPoster():
     if request.form:
         requestData = request.form
         poster = requestData["poster"]
