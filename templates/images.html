@@ -12,11 +12,18 @@
             </form>
         </div>
         <div>
+			
             {% for image in images %}
-
-            <img src="/images/{{image.filepath}}" width="300"/>
 			<br>
-			{{image}}
+			<br>
+			<br>
+			{{image.filepath}}
+			<br>
+			PhotoID: {{image.photoID}} 
+			<br>
+			Posted By: {{image.photoPoster}}
+			<br>
+			 <td><form action="/image_info" method="post"><input type="submit" value="More Info"><input type="hidden" name="photoID" value={{image.photoID}}></form></td>
 			<br>
             {% endfor %}
         </div>

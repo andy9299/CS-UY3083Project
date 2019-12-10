@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>Finstagram</title>
+    </head>
+    <body>
+        <h1>Image Info </h1>
+		<br>
+		{{image[0].filepath}}
+		<br>
+		PhotoID: {{image[0].photoID}}
+		<br>
+		Posted By: {{image[0].firstName}} "{{image[0].photoPoster}}" {{image[0].lastName}}
+		<br>
+		Posted On: {{image[0].postingdate}}
+		<br>
+		Tagged People:
+		<br>
+		{% for person in tagged %}
+			{{person.firstName}} "{{person.username}}" {{person.lastName}}
+			<br>
+		{% endfor %}
+		<br>
+        <a href="/images">Go back</a>
+    </body>
+</html>
