@@ -157,6 +157,34 @@ def upload_image():
         message = "Failed to upload image."
         return render_template("upload.html", message=message)
 
+def addLike():
+    username = session['username']
+    rating = request.form['rating']
+    return render_template("likes.html")
+    if request.form:
+        queryPID = 'SELECT photoID ' \
+            'FROM photo ' \
+            'JOIN follow ON (username_followed = photoPoster) ' \
+            'WHERE followstatus = TRUE AND allFollowers = TRUE AND username_follower = "' \
+            + session["username"] \
+            + '" UNION ' \
+            'SELECT p.photoID ' \
+            'FROM photo as p ' \
+            'JOIN sharedwith as s ON (p.photoID = s.photoID) ' \
+            'JOIN belongto as b ON (b.groupName = s.groupName AND b.owner_username = s.groupOwner) ' \
+            'WHERE b.member_username = "' \
+            + session["username"] +"\"" + \
+            " ORDER BY photoID DESC"
+        with connection.cursor() as cursor:
+            photoID = cursor.execute(queryPID)
+        tstampsec = time.time()
+        timestamp = time.ctime(tstampsec)
+        query = 'INSERT INTO likes' \
+                'VALUES(' + username + photoID + timestamp + rating + ')'
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+    cursor.close()
+
 @app.route("/imageSearch", methods=["GET", "POST"])
 def imageSearch():
     if request.form:
