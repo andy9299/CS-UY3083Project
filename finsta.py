@@ -40,11 +40,57 @@ def index():
 @login_required
 def home():
     return render_template("home.html", username=session["username"])
+  
+#DOESNT WORK CAUSE CHECKBOX THING
+@app.route("/uploadImage", methods=["GET", "POST"])
+@login_required
+def upload_image():
+    if request.files:
+        image_file = request.files.get("imageToUpload", "")
+        image_name = image_file.filename
+        filepath = os.path.join(IMAGES_DIR, image_name)
+        image_file.save(filepath)
+        allfollowers = request.form["AllFollowers"]
+        caption = request.form["caption"]
+        posting_time = time.strftime("%Y-%m-%d %H:%M:%S")
+        username = session["username"]
+        query = "INSERT INTO photo (postingdate, filepath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
+        with connection.cursor() as cursor:
+            cursor.execute(query, (posting_time, filepath, allfollowers, caption, username))
+        print(type(allfollowers))
+        if allfollowers == "0":
+            groups = request.form.getlist('check')
+            owners = request.form.getlist('owner')
+            query = "SELECT max(photoID)FROM photo"
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+            photoID = cursor.fetchone()
+            for group in groups:
+                print(group)
+            for owner in owners:
+                print(owner)
+            #for i in range(len(groups)):
+                #query = "INSERT INTO sharedwith (groupOwner, groupName, photoID ) VALUES (%s, %s, %s)"
+                #with connection.cursor() as cursor:
+                #    cursor.execute(query, (owners[i], groups[i], photoID[0]))
+                #print(owners[i], groups[i], photoID[0])
+        message = "Image has been successfully uploaded."
+        return render_template("upload.html", message=message)
+    else:
+        message = "Failed to upload image."
+        return render_template("upload.html", message=message)
 
 @app.route("/upload", methods=["GET"])
 @login_required
 def upload():
-    return render_template("upload.html")
+    user = session["username"]
+    query = """SELECT groupName, owner_username
+            FROM belongto
+            WHERE member_username = \"""" + user + "\""
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        data = cursor.fetchall()
+    return render_template("upload.html", groups=data)
 
 @app.route("/images", methods=["GET"])
 @login_required
