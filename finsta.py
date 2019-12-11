@@ -49,18 +49,19 @@ def upload():
 @app.route("/images", methods=["GET"])
 @login_required
 def images():
+    user = session["username"]
     query = 'SELECT p.filepath, p.photoID, p.photoPoster ' \
             'FROM photo as p ' \
             'JOIN follow as f ON (f.username_followed = p.photoPoster) ' \
             'WHERE followstatus = TRUE AND allFollowers = TRUE AND username_follower = "' \
-            + session["username"] \
+            + user \
             + '" UNION ' \
             'SELECT p.filepath, p.photoID, p.photoPoster ' \
             'FROM photo as p ' \
             'JOIN sharedwith as s ON (p.photoID = s.photoID) ' \
             'JOIN belongto as b ON (b.groupName = s.groupName AND b.owner_username = s.groupOwner) ' \
             'WHERE b.member_username = "' \
-            + session["username"] +"\"" + \
+            + user +"\"" + \
             " ORDER BY photoID DESC"
     with connection.cursor() as cursor:
         cursor.execute(query)
@@ -69,14 +70,16 @@ def images():
 
 @app.route("/image_info", methods=["GET", "POST"])
 def image_info():
+    photoID = request.form["photoID"]
+    user = session["username"]
     query = 'SELECT p.filepath, p.photoID, p.photoPoster, per.firstName, per.lastName, p.postingdate ' \
             'FROM photo as p ' \
             'JOIN follow as f ON (f.username_followed = p.photoPoster) ' \
             'JOIN person as per ON (per.username = p.photoPoster) ' \
             'WHERE followstatus = TRUE AND allFollowers = TRUE AND username_follower = "' \
-            + session["username"] \
+            + user \
             + '" AND p.photoID = "' \
-            + request.form["photoID"] \
+            + photoID \
             + '" UNION ' \
             'SELECT p.filepath, p.photoID, p.photoPoster, per.firstName, per.lastName, p.postingdate ' \
             'FROM photo as p ' \
@@ -84,16 +87,16 @@ def image_info():
             'JOIN belongto as b ON (b.groupName = s.groupName AND b.owner_username = s.groupOwner) ' \
             'JOIN person as per ON (per.username = p.photoPoster) ' \
             'WHERE b.member_username = "' \
-            + session["username"] +"\" " \
+            + user +"\" " \
             'AND p.photoID = "' \
-            + request.form["photoID"] + "\""
+            + photoID + "\""
     query2 ="""SELECT per.username, per.firstName, per.lastName
             FROM tagged as t 
             JOIN person as per ON (t.username = per.username)
-            WHERE t.tagstatus = TRUE AND t.photoID = \"""" + request.form["photoID"] + "\""
+            WHERE t.tagstatus = TRUE AND t.photoID = \"""" + photoID + "\""
     query3 = """SELECT username, rating
             FROM likes
-            WHERE photoID = \"""" + request.form["photoID"] + "\""
+            WHERE photoID = \"""" + photoID + "\""
     with connection.cursor() as cursor:
         cursor.execute(query)
         data = cursor.fetchall()
