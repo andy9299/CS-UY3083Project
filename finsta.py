@@ -220,27 +220,50 @@ def imageSearchByPoster():
     if request.form:
         requestData = request.form
         poster = requestData["poster"]
-        query = 'SELECT photoID ' \
-                'FROM photo ' \
-                'JOIN follow ON (username_followed = photoPoster) ' \
-                'WHERE followstatus = TRUE AND allFollowers = TRUE AND username_follower = "' \
-                + session["username"] + "\"" \
-                + " AND photoPoster = \"" \
-                + poster + "\"" \
-                + ' UNION ' \
-                'SELECT p.photoID ' \
-                'FROM photo as p ' \
-                'JOIN sharedwith as s ON (p.photoID = s.photoID) ' \
-                'JOIN belongto as b ON (b.groupName = s.groupName AND b.owner_username = s.groupOwner) ' \
-                'WHERE b.member_username = "' \
-                + session["username"] + "\"" \
-                + " AND p.photoPoster = \"" \
-                + poster + "\""\
-                + " ORDER BY photoID DESC"
+        user = session["username"]
+        query = """SELECT photoID, filepath, photoPoster 
+                FROM photo JOIN follow ON (username_followed = photoPoster) 
+                WHERE followstatus = TRUE 
+                AND allFollowers = TRUE 
+                AND username_follower = \"""" + user + \
+                """\" AND photoPoster = \"""" + poster + \
+                """\" UNION 
+                SELECT p.photoID, p.filepath, p.photoPoster 
+                FROM photo as p 
+                JOIN sharedwith as s ON (p.photoID = s.photoID) 
+                JOIN belongto as b ON (b.groupName = s.groupName AND b.owner_username = s.groupOwner) 
+                WHERE b.member_username = "TestUser" AND p.photoPoster = \"""" + poster + \
+                "\" ORDER BY photoID DESC"
         with connection.cursor() as cursor:
             cursor.execute(query)
         data = cursor.fetchall()
         return render_template("images_by_poster.html", poster=poster, images=data)
+
+@app.route("/imageSearchByTag", methods=["GET", "POST"])
+def imageSearchByTag():
+    if request.form:
+        requestData = request.form
+        tag = requestData["tag"]
+        user = session["username"]
+        query = """SELECT p.photoID, p.filepath, p.photoPoster
+                FROM tagged as t 
+                JOIN photo as p ON (t.photoID = p.photoID)
+                WHERE t.tagstatus = TRUE 
+                AND t.username = \"""" + tag + \
+                """\" AND p.photoID IN (
+                SELECT photoID
+                FROM photo JOIN follow ON (username_followed = photoPoster)
+                WHERE followstatus = TRUE AND allFollowers = TRUE AND username_follower = \"""" + user + \
+                """\" UNION
+                SELECT p.photoID
+                FROM photo as p 
+                JOIN sharedwith as s ON (p.photoID = s.photoID)
+                JOIN belongto as b ON (b.groupName = s.groupName AND b.owner_username = s.groupOwner)
+                WHERE b.member_username = \"""" + user + "\") ORDER BY p.photoID DESC"
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+        data = cursor.fetchall()
+        return render_template("images_by_tag.html", tag=tag, images=data)
 if __name__ == "__main__":
     if not os.path.isdir("images"):
         os.mkdir(IMAGES_DIR)
