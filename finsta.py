@@ -235,7 +235,8 @@ def imageSearchByPoster():
                 FROM photo as p 
                 JOIN sharedwith as s ON (p.photoID = s.photoID) 
                 JOIN belongto as b ON (b.groupName = s.groupName AND b.owner_username = s.groupOwner) 
-                WHERE b.member_username = "TestUser" AND p.photoPoster = \"""" + poster + \
+                WHERE b.member_username = \"""" + user + \
+                """\" AND p.photoPoster = \"""" + poster + \
                 "\" ORDER BY photoID DESC"
         with connection.cursor() as cursor:
             cursor.execute(query)
