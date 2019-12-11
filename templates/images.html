@@ -11,6 +11,14 @@
                 <input type="submit" value="Search By Poster">
             </form>
         </div>
+		<div>
+            <form action="/imageSearchByTag" method="post">
+                <input type="text" name="tag" placeholder="Enter Tag by Username" required/>
+                <br/>
+                <input type="submit" value="Search By Tag">
+            </form>
+        </div>
+		<br>
         <div>	
             {% for image in images %}
 			<br>
