@@ -5,7 +5,7 @@
     <body>
         <h1>Upload an Image!</h1>
         <div>
-            <form action="/uploadImage" method="post" enctype="multipart/form-data">
+            <form action="/uploadresult" method="post" enctype="multipart/form-data">
                 <input type="file" name="imageToUpload" accept="image/*">
                 <br/>
                 <input type="radio" name="AllFollowers" value="1" checked> Visible to all followers
@@ -14,7 +14,7 @@
                 <input type="radio" name="AllFollowers" value="0"> Visible to group members only
                 <br/>
 				{% for group in groups %}
-					<input type="checkbox" name="check" value="{{group.groupName}}"><input type="hidden" name="owner" value="{{group.owner_username}}"> {{group.groupName}}
+					<input type="checkbox" name="{{group.groupName}}" value="{{group.owner_username}}"> {{group.groupName}}
 					<br>
 				{% endfor %}
 				{% endif %}
@@ -23,9 +23,6 @@
                 <input type="submit" value="Upload">
             </form>
         </div>
-        {% if message %}
-            {{ message }}
-        {% endif %}
         <br/>
         <a href="/">Go back</a>
     </body>
