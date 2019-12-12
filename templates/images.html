@@ -30,7 +30,10 @@
 			<br>
 			Posted By: {{image.photoPoster}}
 			<br>
-			 <td><form action="/image_info" method="post"><input type="submit" value="More Info"><input type="hidden" name="photoID" value={{image.photoID}}></form></td>
+			<form action="/tagUser" method="post" enctype="multipart/form-data">
+                	Username to tag: <input type="text" name="username" placeholder="Enter a username" required><input type="submit" value="Tag"><input type="hidden" name="photo_id" value={{image.photoID}}> 
+            		</form>
+			<td><form action="/image_info" method="post"><input type="submit" value="More Info"><input type="hidden" name="photoID" value={{image.photoID}}></form></td>
 			<br>
             {% endfor %}
         </div>
