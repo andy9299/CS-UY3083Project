@@ -397,29 +397,17 @@ def unfollow():
 def addLike():
     username = session['username']
     rating = request.form['rating']
-    if request.form:
-        queryPID = 'SELECT photoID ' \
-            'FROM photo ' \
-            'JOIN follow ON (username_followed = photoPoster) ' \
-            'WHERE followstatus = TRUE AND allFollowers = TRUE AND username_follower = "' \
-            + session["username"] \
-            + '" UNION ' \
-            'SELECT p.photoID ' \
-            'FROM photo as p ' \
-            'JOIN sharedwith as s ON (p.photoID = s.photoID) ' \
-            'JOIN belongto as b ON (b.groupName = s.groupName AND b.owner_username = s.groupOwner) ' \
-            'WHERE b.member_username = "' \
-            + session["username"] +"\"" + \
-            " ORDER BY photoID DESC"
-        with connection.cursor() as cursor:
-            cursor.execute(query) #finds photoIDs
-        tstampsec = time.time()
-        timestamp = time.ctime(tstampsec)
-        query1 = 'INSERT INTO likes' \
-                 'VALUES(' + username + photoID + timestamp + rating + ')'
+    photoID = request.form['photoID']
+    f = '%Y-%m-%d %H:%M:%S'
+    now = time.localtime()
+    tsForQuery = time.strftime(f, now)
+    query1 = "INSERT INTO likes VALUES('" + username + "', '" + photoID + "', '" + tsForQuery + "', '" + rating + "')"
+    try:
         with connection.cursor() as cursor:
             cursor.execute(query1) #inserts values into the table
-        return render_template("image_info.html", likes=likes)
+    except pymysql.err.IntegrityError:
+        return render_template("likes_results.html")
+    return render_template("likes_results.html", likes=likes)
     
 @app.route("/imageSearchByPoster", methods=["GET", "POST"])
 def imageSearchByPoster():
