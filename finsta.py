@@ -41,8 +41,7 @@ def index():
 def home():
     return render_template("home.html", username=session["username"])
   
-#DOESNT WORK CAUSE CHECKBOX THING
-@app.route("/uploadImage", methods=["GET", "POST"])
+@app.route("/uploadresult", methods=["GET", "POST"])
 @login_required
 def upload_image():
     if request.files:
@@ -57,7 +56,6 @@ def upload_image():
         query = "INSERT INTO photo (postingdate, filepath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
         with connection.cursor() as cursor:
             cursor.execute(query, (posting_time, filepath, allfollowers, caption, username))
-        print(type(allfollowers))
         if allfollowers == "0":
             groups = request.form.getlist('check')
             owners = request.form.getlist('owner')
@@ -65,20 +63,24 @@ def upload_image():
             with connection.cursor() as cursor:
                 cursor.execute(query)
             photoID = cursor.fetchone()
-            for group in groups:
-                print(group)
-            for owner in owners:
-                print(owner)
-            #for i in range(len(groups)):
-                #query = "INSERT INTO sharedwith (groupOwner, groupName, photoID ) VALUES (%s, %s, %s)"
-                #with connection.cursor() as cursor:
-                #    cursor.execute(query, (owners[i], groups[i], photoID[0]))
-                #print(owners[i], groups[i], photoID[0])
+            groupList = request.form
+            print(len(groupList))
+            if (len(groupList) > 2):
+                i = 1;
+                for x in groupList:
+                    if i != len(groupList) and i != 1:
+                        print(x)
+                        print(groupList[x])
+                        print(photoID['max(photoID)'])
+                        query = "INSERT INTO sharedwith (groupOwner, groupName, photoID ) VALUES (%s, %s, %s)"
+                        with connection.cursor() as cursor:
+                            cursor.execute(query, (x, groupList[x], photoID['max(photoID)']))
+                    i += 1
         message = "Image has been successfully uploaded."
-        return render_template("upload.html", message=message)
+        return render_template("uploadresult.html", message=message)
     else:
         message = "Failed to upload image."
-        return render_template("upload.html", message=message)
+        return render_template("uploadresult.html", message=message)
 
 @app.route("/upload", methods=["GET"])
 @login_required
