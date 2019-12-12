@@ -1,0 +1,16 @@
+<html>
+	<body>
+		<h1>Unfollow a user</h1>
+		<div>
+			<form action="/unfollow" method="post">
+                <input type="text" name="username" placeholder="Enter Username" required/>
+                <br/>
+                <input type="submit" value="unfollow">
+			</form>
+		</div>
+		{% if message %}
+            {{ message }}
+        {% endif %}
+		<a href="/home">Go back</a>
+	</body>
+</html>
