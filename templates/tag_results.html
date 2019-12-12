@@ -1,6 +1,13 @@
 <html>
 	<body>
-		<h3>Tagged!</h3>
+		<h3>
+			{% if error %}
+				{{ error }}
+			{% endif %}
+			{% if message %}
+				{{ message }}
+			{% endif %}
+		</h3>
 		<div>
 			<a href="#" onclick="history.go(-1)">Go Back</a>
 		</div>
