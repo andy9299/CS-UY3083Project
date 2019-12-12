@@ -41,6 +41,11 @@ def index():
 def home():
     return render_template("home.html", username=session["username"])
   
+@app.route("/unfollow_html", methods=["GET", "POST"])
+@login_required
+def unfollow_html():
+    return render_template("unfollow.html")
+  
 @app.route("/uploadresult", methods=["GET", "POST"])
 @login_required
 def upload_image():
@@ -231,6 +236,30 @@ def upload_image():
     else:
         message = "Failed to upload image."
         return render_template("upload.html", message=message)
+
+@app.route("/unfollow", methods=["POST"])
+def unfollow():
+    if request.form:
+        username = request.form['username'] #from search bar?
+        query = "DELETE FROM follow WHERE username_followed =%s AND username_follower='" + session["username"] + "'"
+        search_query = "SELECT username_followed FROM follow WHERE username_follower='" + session["username"] +"'"
+        with connection.cursor() as cursor:
+            cursor.execute(search_query)
+            search_user = cursor.fetchall()
+        val_lst = []
+        for dic in search_user:
+            val_lst += list(dic.values())
+        if str(username) not in val_lst:
+            with connection.cursor() as cursor:
+                cursor.execute(query, username)
+            message = "You are already not following " + str(username) + ". Please try again."
+            return render_template("unfollow.html", message = message)
+        else:
+            with connection.cursor() as cursor:
+                cursor.execute(query, username)
+            message = "You have unfollowed " + str(username) + "."
+            return render_template("unfollow.html", message = message)
+      
 
 @app.route("/addLike", methods=["GET", "POST"])
 def addLike():
