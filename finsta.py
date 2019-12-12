@@ -213,30 +213,6 @@ def logout():
     session.pop("username")
     return redirect("/")
 
-@app.route("/uploadImage", methods=["GET", "POST"])
-@login_required
-def upload_image():
-    if request.files:
-        image_file = request.files.get("imageToUpload", "")
-        image_name = image_file.filename
-        filepath = os.path.join(IMAGES_DIR, image_name)
-        image_file.save(filepath)
-        allfollowers = request.form["AllFollowers"]
-        caption = request.form["caption"]
-        posting_time = time.strftime("%Y-%m-%d %H:%M:%S")
-        username = session["username"]
-
-        
-        query = "INSERT INTO photo (postingdate, filepath, allFollowers, caption, photoPoster) VALUES (%s, %s, %s, %s, %s)"
-        print(posting_time, filepath, allfollowers, caption)
-        with connection.cursor() as cursor:
-            cursor.execute(query, (posting_time, filepath, allfollowers, caption, username))
-        message = "Image has been successfully uploaded."
-        return render_template("upload.html", message=message)
-    else:
-        message = "Failed to upload image."
-        return render_template("upload.html", message=message)
-
 @app.route("/unfollow", methods=["POST"])
 def unfollow():
     if request.form:
