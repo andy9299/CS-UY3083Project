@@ -79,7 +79,7 @@ def upload_image():
                         print(photoID['max(photoID)'])
                         query = "INSERT INTO sharedwith (groupOwner, groupName, photoID ) VALUES (%s, %s, %s)"
                         with connection.cursor() as cursor:
-                          cursor.execute(query, (groupList[x], x, photoID['max(photoID)']))
+                            cursor.execute(query, (groupList[x], x, photoID['max(photoID)']))
                     i += 1
         message = "Image has been successfully uploaded."
         return render_template("uploadresult.html", message=message)
@@ -264,7 +264,7 @@ def tag_user():
     data = cursor.fetchone()
     if data == None: #This means the person doesn't exist
         error = "User does not exist, please try again."
-        return render_template("images.html", error=error, images=img_data)
+        return render_template("tag_results.html", error=error)
     
     #check if user is already tagged.
     query = "SELECT * FROM tagged WHERE username = %s AND photoID = %s"
@@ -274,7 +274,7 @@ def tag_user():
 
     if is_tag_data != None: #user was already tagged
         error = "This user was already tagged or a tag request has already been sent."
-        return render_template("images.html", error=error, images=img_data)
+        return render_template("tag_results.html", error=error)
     
     #check if user can view the photo
     elif userToTag == curr_user: #self tag
@@ -282,7 +282,7 @@ def tag_user():
         with connection.cursor() as cursor:
             cursor.execute(query, (userToTag, photo_id))
         message = "You successfully tagged yourself"
-        return render_template("images.html", message=message, images=img_data)
+        return render_template("tag_results.html", message=message)
     
     else:
         query = """SELECT photoID 
@@ -301,17 +301,17 @@ def tag_user():
 
         if (data == None and data2 == None): #Empty set, so the userToTag can't see the photo
             error = userToTag + " is unable to be tagged right now. Check follower status or friend groups."
-            return render_template("images.html", error=error, images=img_data)
+            return render_template("tag_results.html", error=error)
      
         else: #userToTag can see the photo
             query = "INSERT INTO tagged (username, photoID, tagstatus) VALUES (%s, %s, false)"
             with connection.cursor() as cursor:
                 cursor.execute(query, (userToTag,photo_id))
             message = "Tag request successfully sent."
-            return render_template("images.html", message=message, images=img_data)
+            return render_template("tag_results.html", message=message)
             
     error = "Please enter a user to be tagged."
-    return render_template("images.html", error=error, images=img_data)
+    return render_template("tag_results.html", error=error)
 
 @app.route("/request", methods=["GET"])
 @login_required
@@ -407,7 +407,7 @@ def addLike():
             cursor.execute(query1) #inserts values into the table
     except pymysql.err.IntegrityError:
         return render_template("likes_results.html")
-    return render_template("likes_results.html", likes=likes)
+    return render_template("likes_results.html")
     
 @app.route("/imageSearchByPoster", methods=["GET", "POST"])
 def imageSearchByPoster():
