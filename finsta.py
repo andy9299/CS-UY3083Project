@@ -79,7 +79,7 @@ def upload_image():
                         print(photoID['max(photoID)'])
                         query = "INSERT INTO sharedwith (groupOwner, groupName, photoID ) VALUES (%s, %s, %s)"
                         with connection.cursor() as cursor:
-                        cursor.execute(query, (groupList[x], x, photoID['max(photoID)']))
+                          cursor.execute(query, (groupList[x], x, photoID['max(photoID)']))
                     i += 1
         message = "Image has been successfully uploaded."
         return render_template("uploadresult.html", message=message)
