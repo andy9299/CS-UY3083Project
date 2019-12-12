@@ -25,7 +25,7 @@
 		<br>
 		<form action="/addLike" method="post">
             <input type="hidden" name="photoID" value="{{image[0].photoID}}">
-            <input type="submit" value="likes" onclick="alert('You liked this photo!')">
+            <input type="submit" value="likes">
 			<select name="rating">
 				<option value="5">5</option>
 				<option value="4">4</option>
@@ -33,9 +33,6 @@
 				<option value="2">2</option>
 				<option value="1">1</option>
 			</select>
-			{% if error %}
-				{{ error }}
-			{% endif %}
         </form>
 		<br>
 		Ratings:
